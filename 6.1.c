@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <conio.h>
 
 typedef struct
 {
@@ -10,11 +12,13 @@ typedef struct
     float promedio;
 }sAlumno;
 
+void LECTURA(FILE *);
+
 int main()
 {
     sAlumno alumno;
     FILE * archivo;
-    int i;
+
     archivo = fopen("ALUMNOS.dat", "wb");
     if(archivo == NULL)
     {
@@ -22,7 +26,7 @@ int main()
         getch();
         exit(1);
     }
-    printf("Ingrese el DNI (FIN '0'): ");
+    printf("DNI (FIN '0'): ");
     scanf("%d", &alumno.dni);
     while(alumno.dni != 0)
     {
@@ -35,11 +39,18 @@ int main()
         scanf("%d", &alumno.nota2);
         alumno.promedio = (alumno.nota1 + alumno.nota2) / 2;
         fwrite(&alumno, sizeof(sAlumno), 1,archivo);
-        printf("Ingrese el DNI (FIN '0'): ");
+        printf("DNI (FIN '0'): ");
         scanf("%d", &alumno.dni);
     }
     fclose(archivo);
+    printf("-------LECTURA-------\n");
+    LECTURA(archivo);
+    return 0;
+}
 
+void LECTURA(FILE * archivo)
+{
+    sAlumno alumno;
     archivo = fopen("ALUMNOS.dat", "rb");
     if(archivo == NULL)
     {
@@ -47,18 +58,15 @@ int main()
         getch();    
         exit(1);
     }
-    i = 0;
     fread(&alumno, sizeof(sAlumno), 1, archivo);
     while ( !feof(archivo) )
     {
-        i++;
+        printf("DNI: %d\n", alumno.dni);
+        printf("NOMBRE Y APELLIDO: %s\n", alumno.nombreYapellido);
+        printf("NOTA 1: %d\n", alumno.nota1);
+        printf("NOTA 2: %d\n", alumno.nota2);
+        printf("PROMEDIO: %.2f\n", alumno.promedio);
         fread(&alumno, sizeof(sAlumno), 1, archivo);
-        printf("%d\n", alumno.dni);
-        printf("%s\n", alumno.nombreYapellido);
-        printf("%d\n", alumno.nota1);
-        printf("%d\n", alumno.nota2);
-        printf("%f\n", alumno.promedio);
     }
-    fclose(archivo);
-    return 0;
+    fclose(archivo); 
 }
