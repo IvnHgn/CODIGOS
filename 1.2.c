@@ -3,29 +3,47 @@
 int  Buscar(int[], int, int);
 int  leeYvalida(int, int);
 void IngresaCodigos(int[], int);
-void CargaPedidos(int[], int[]);
+int  IngresaProducto();
 void MostrarListado(int[], int[], int);
 int  Maximo(int[], int);
-void MostrarMaxUnidades(int[], int[], int);
-void MostrarMinUnidades(int[], int[], int);
+int  Minimo(int[], int);
+void MostrarValor(int[], int[], int, int);
 
 int main()
 {
-    int vProductos[10], vUnidades[10]={0};
-    IngresaCodigos(vProductos, 10);
-    CargaPedidos(vProductos, vUnidades);
-    MostrarListado(vProductos, vUnidades, 10);
-    MostrarMaxUnidades(vProductos, vUnidades, 10);
-    MostrarMinUnidades(vProductos, vUnidades, 10);
+    int vCodigoProductos[10], vPedidos[10]={0};
+    int codigo, posicion, cantidad, max, min;
+
+    IngresaCodigos(vCodigoProductos, 10);
+    codigo = IngresarProducto();
+    while(codigo!=0)
+    {
+        posicion = Buscar(vCodigoProductos, codigo, 10);
+        if(posicion != -1)
+        {
+            cantidad = IngresarPositivo();
+            vPedidos[posicion]+=cantidad;
+        }
+        else
+            Printf("CODIGO NO EXISTE(COMO RACING)\n");
+        codigo = IngresarProducto();
+    }
+    ListaDeProductos(vCodigoProductos, vPedidos, 10);
+    max = ValorMaximo(vPedidos, 10);
+    printf("VALOR MAXIMO: %d\n", max);
+    MostrarValor(vCodigoProductos, vPedidos, max, 10);
+    min = ValorMinimo(vPedidos, 10);
+    printf("VALOR MINIMO: %d\n", min);
+    MostrarValor(vCodigoProductos, vPedidos, min, 10);
     return 0;
 }
 
-int Buscar(int vProductos[], int datoABuscar, int N)  // N = Cantidad de Elementos
+int Buscar(int vCodigoProductos[], int datoABuscar, int N)  // N = Cantidad de Elementos
 {
     int i=0, posicion=-1;
     while (posicion==-1 && i<N)
     {
-        if (vProductos[i]==datoABuscar)
+        if (vCodigoProductos[i]==datoABuscar)
             posicion = i;
         else
             i++;
@@ -44,59 +62,51 @@ int leeYvalida(int limiteInf, int limiteSup)
     return aux;
 }
 
-void IngresaCodigos(int vProductos[], int N)
+void IngresaCodigos(int vCodigoProductos[], int N)
 {
-    int i, posicion, aux;
+    int i, posicion, codigo;
 
     for (i=0; i<N; i++)
     {
         do
         {
-            printf("Ingrese un Codigo(de 4 cifras y sin repetir): \n");
-            aux = leeYvalida(1000, 9999);
-            posicion = Buscar(vProductos, aux, i);
+            printf("CODIGO (DE 4 CIFRAS Y SIN DUPLICAR):\n");
+            codigo = leeYvalida(1000, 9999);
+            posicion = Buscar(vCodigoProductos, codigo, i);
             if (posicion!=-1)
                 printf("Dato Duplicado. Ingrese otro.\n");
-        } while (posicion!=-1);
-        vProductos[i] = aux;
+        }while (posicion!=-1);
+        vCodigoProductos[i] = codigo;
     }
 }
-
-void CargaPedidos(int vProductos[], int vUnidades[])
+int IngresarProducto()
 {
-    int i, codigo, unidades, posicion;
-    do
-    {       
-        printf("\nIngrese el codigo de un producto: ");
-        scanf("%d", &codigo);
-        posicion = Buscar(vProductos, codigo, 10);
-        if(posicion == -1 && codigo!=0)
-            printf("\nCODIGO NO VALIDO, INGRESE OTRO.");
-    }while(posicion == -1 && codigo!=0);
-
-    while(codigo!=0)
-    {
-        printf("Ingrese cantidad de unidades: ");
-        scanf("%d", &unidades);
-        vUnidades[posicion] += unidades;
-        do
-        {       
-            printf("\nIngrese el codigo de un producto: ");
-            scanf("%d", &codigo);
-            posicion = Buscar(vProductos, codigo, 10);
-            if(posicion == -1 && codigo!=0)
-                printf("\nCodigo no valido. Ingrese otro.");
-        } while (posicion == -1 && codigo!=0);
-    }  
+    int codigo;
+    printf("\nINGRESAR CODIGO DE PRODUCTO: ");
+    scanf("%d", &codigo);
+    return codigo;
 }
 
-void MostrarListado(int vProductos[], int vUnidades[], int N)
+int IngresarPositivo()
+{
+    int cantidad;
+    do
+    {
+        printf("\nCANTIDAD DE UNIDADES SOLICITADAS: ");
+        scanf("%d", &cantidad);
+        if(cantidad <= 0)
+            printf("VALOR ERRONEO\n");
+    }while(cantidad<=0);
+    return cantidad;
+}
+
+void MostrarListado(int vCodigoProductos[], int vPedidos[], int N)
 {
     int i;
     printf("\nCODIGO  UNIDADES");
     for(i=0; i<N; i++)
     {
-        printf("\n%6d  %8d", vProductos[i], vUnidades[i]);
+        printf("\n%6d  %8d", vCodigoProductos[i], vPedidos[i]);
     }
 }
 
@@ -111,18 +121,6 @@ int Maximo(int v[], int N)
     return max;
 }
 
-void MostrarMaxUnidades(int vProductos[], int vUnidades[], int N)
-{
-    int i, max;
-    max=Maximo(vUnidades, 10);
-    printf("\nPRODUCTO/S  MAYOR CANTIDAD DE UNIDADES");
-    for ( i = 0; i < N; i++)
-    {
-        if(vUnidades[i]==max)
-            printf("\n%10d  %26d", vProductos[i], max);
-    }
-}
-
 int Minimo(int v[], int N)
 {
     int min=v[0], i;
@@ -134,14 +132,13 @@ int Minimo(int v[], int N)
     return min;
 }
 
-void MostrarMinUnidades(int vProductos[], int vUnidades[], int N)
+void MostrarValor(int vCodigoProductos[], int vPedidos[], int valor, int N)
 {
-    int i, min;
-    min=Minimo(vUnidades, 10);
-    printf("\nPRODUCTO/S  MENOR CANTIDAD DE UNIDADES");
+    int i;
+    printf("EL/LOS PRODUCTOS: \n");
     for ( i = 0; i < N; i++)
     {
-        if(vUnidades[i]==min)
-            printf("\n%10d  %26d", vProductos[i], min);
+        if(vPedidos[i] == valor)
+            printf("%d\n", vCodigoProductos[i]);
     }
 }
