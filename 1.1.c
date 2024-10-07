@@ -18,7 +18,7 @@ int main()
     int vec[20], min, max;
 
     srand(time(NULL));              
-    CargaAleatoria(vec, TAM, 1000);
+    CargaAleatoria(vec, 1000, TAM);
     min= Minimo(vec, TAM);
     max= Maximo(vec, TAM);
     MostrarMinimo(vec, min, TAM);
@@ -27,7 +27,7 @@ int main()
 }
 
 // N= Cantidad de Elementos
-void CargaAleatoria(int vec[], int N, int max)
+void CargaAleatoria(int vec[], int max, int N)
 {
     int i;
     for(i=0; i<N; i++)
